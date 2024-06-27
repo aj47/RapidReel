@@ -23,6 +23,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { Input } from "./ui/input"
 
 export function Categoriser() {
   const [transcript, setTranscript] = useState([])
@@ -62,6 +63,15 @@ export function Categoriser() {
   const [editingCategory, setEditingCategory] = useState(null)
   const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0)
   const [isManualCategorization, setIsManualCategorization] = useState(true)
+  const [newCategory, setNewCategory] = useState({ label: "", color: "#000000", shortcut: "" })
+
+  const handleAddCategory = () => {
+    if (newCategory.label && newCategory.color && newCategory.shortcut) {
+      const newId = Math.max(...categories.map(c => c.id)) + 1
+      setCategories([...categories, { ...newCategory, id: newId }])
+      setNewCategory({ label: "", color: "#000000", shortcut: "" })
+    }
+  }
   const handleCategoryEdit = (category) => {
     setEditingCategory(category)
   }
@@ -202,6 +212,32 @@ export function Categoriser() {
                     </div>
                   </div>
                 ))}
+                <div className="mt-4">
+                  <h3 className="text-sm font-semibold mb-2">Add New Category</h3>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="text"
+                      placeholder="Label"
+                      value={newCategory.label}
+                      onChange={(e) => setNewCategory({ ...newCategory, label: e.target.value })}
+                      className="flex-grow"
+                    />
+                    <Input
+                      type="color"
+                      value={newCategory.color}
+                      onChange={(e) => setNewCategory({ ...newCategory, color: e.target.value })}
+                      className="w-10 h-10 p-1 border-none rounded-full cursor-pointer"
+                    />
+                    <Input
+                      type="text"
+                      placeholder="Shortcut"
+                      value={newCategory.shortcut}
+                      onChange={(e) => setNewCategory({ ...newCategory, shortcut: e.target.value })}
+                      className="w-20"
+                    />
+                    <Button onClick={handleAddCategory}>Add</Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
