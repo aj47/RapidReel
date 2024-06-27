@@ -19,89 +19,62 @@ To read more about using these font, please visit the Next.js documentation:
 **/
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Input } from "./ui/input"
+import { useCategoriser, CategoriserProvider } from "./CategoriserContext"
 
 export function Categoriser() {
-  const [transcript, setTranscript] = useState([])
+  return (
+    <CategoriserProvider>
+      <CategoriserContent />
+    </CategoriserProvider>
+  );
+}
 
-  useEffect(() => {
-    fetch('/transcript.json')
-      .then(response => response.json())
-      .then(data => {
-        const formattedTranscript = data.chunks.map((chunk, index) => ({
-          id: index + 1,
-          text: chunk.text,
-          category: getCategoryId(chunk.classification),
-          timestamp: chunk.timestamp
-        }));
-        setTranscript(formattedTranscript);
-      })
-      .catch(error => console.error('Error loading transcript:', error));
-  }, []);
+function CategoriserContent() {
+  const {
+    transcript,
+    categories,
+    currentTranscriptIndex,
+    isManualCategorization,
+    setIsManualCategorization,
+    handleTextCategoryChange,
+    handleCategorize,
+    handleNextTranscript,
+    handlePreviousTranscript,
+    addCategory,
+    updateCategory
+  } = useCategoriser()
 
-  const getCategoryId = (classification) => {
-    switch (classification) {
-      case "reviewing AI tool":
-        return 1;
-      case "talking to chat":
-        return 2;
-      case "irrelevant":
-        return 3;
-      default:
-        return 3; // Default to irrelevant if unknown
-    }
-  }
-  const [categories, setCategories] = useState([
-    { id: 1, label: "reviewing AI tool", color: "#4CAF50", shortcut: "1" },
-    { id: 2, label: "talking to chat", color: "#2196F3", shortcut: "2" },
-    { id: 3, label: "irrelevant", color: "#808080", shortcut: "3" },
-  ])
   const [editingCategory, setEditingCategory] = useState(null)
-  const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0)
-  const [isManualCategorization, setIsManualCategorization] = useState(true)
   const [newCategory, setNewCategory] = useState({ label: "", color: "#000000", shortcut: "" })
 
   const handleAddCategory = () => {
     if (newCategory.label && newCategory.color && newCategory.shortcut) {
-      const newId = Math.max(...categories.map(c => c.id)) + 1
-      setCategories([...categories, { ...newCategory, id: newId }])
+      addCategory(newCategory)
       setNewCategory({ label: "", color: "#000000", shortcut: "" })
     }
   }
+
   const handleCategoryEdit = (category) => {
     setEditingCategory(category)
   }
+
   const handleCategorySave = (updatedCategory) => {
-    setCategories(categories.map((c) => (c.id === updatedCategory.id ? updatedCategory : c)))
+    updateCategory(updatedCategory)
     setEditingCategory(null)
   }
-  const handleTextCategoryChange = (textId, newCategoryId) => {
-    setTranscript(
-      transcript.map((t) => (t.id === textId ? { ...t, category: newCategoryId } : t))
-    )
-  }
-  const handleNextTranscript = () => {
-    setCurrentTranscriptIndex((prevIndex) => prevIndex + 1)
-  }
-  const handlePreviousTranscript = () => {
-    setCurrentTranscriptIndex((prevIndex) => prevIndex - 1)
-  }
-  const handleCategorize = (categoryId) => {
-    setTranscript(transcript.map(
-      (t, index) => (index === currentTranscriptIndex ? { ...t, category: categoryId } : t)
-    ))
-    handleNextTranscript()
-  }
+
   const handleKeyboardShortcut = (event) => {
     const shortcutIndex = categories.findIndex((category) => category.shortcut === event.key)
     if (shortcutIndex !== -1) {
       handleCategorize(categories[shortcutIndex].id)
     }
   }
+
   useEffect(() => {
     document.addEventListener("keydown", handleKeyboardShortcut)
     return () => {
