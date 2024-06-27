@@ -24,6 +24,9 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Input } from "./ui/input"
+import { Dashboard } from "@/components/Dashboard"
+import { EasyCategorise } from "@/components/EasyCategorise"
+
 import { useCategoriser, CategoriserProvider } from "./CategoriserContext"
 
 export function Categoriser() {
@@ -38,15 +41,15 @@ function CategoriserContent() {
   const {
     transcript,
     categories,
+    handleTextCategoryChange,
+    addCategory,
+    updateCategory,
     currentTranscriptIndex,
     isManualCategorization,
     setIsManualCategorization,
-    handleTextCategoryChange,
     handleCategorize,
     handleNextTranscript,
     handlePreviousTranscript,
-    addCategory,
-    updateCategory
   } = useCategoriser()
 
   const [editingCategory, setEditingCategory] = useState(null)
@@ -99,189 +102,22 @@ function CategoriserContent() {
         </div>
       </div>
       {isManualCategorization ? (
-        <div className="flex-1 overflow-auto p-4">
-          <div className="grid grid-cols-[1fr_300px] gap-4">
-            <div className="bg-muted rounded-md p-4">
-              <h2 className="text-lg font-bold mb-2">Transcript</h2>
-              <div className="space-y-2">
-                {transcript.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-background rounded-md p-2 flex items-center justify-between"
-                    style={{
-                      borderLeft: `4px solid ${categories.find((c) => c.id === item.category).color}`,
-                      backgroundColor: categories.find((c) => c.id === item.category).color,
-                      color: categories.find((c) => c.id === item.category).color + "-foreground",
-                    }}>
-                    <div className="text-sm">{item.text}</div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoveVerticalIcon className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {categories.map((category) => (
-                          <DropdownMenuItem
-                            key={category.id}
-                            onSelect={() => handleTextCategoryChange(item.id, category.id)}>
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-4 h-4 rounded-full"
-                                style={{ backgroundColor: category.color }} />
-                              <span>
-                                {category.label} ({category.shortcut})
-                              </span>
-                            </div>
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="bg-muted rounded-md p-4">
-              <h2 className="text-lg font-bold mb-2">Categories</h2>
-              <div className="space-y-2">
-                {categories.map((category) => (
-                  <div key={category.id} className="flex items-center justify-between">
-                    {editingCategory?.id === category.id ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={editingCategory.label}
-                          onChange={(e) => setEditingCategory({ ...editingCategory, label: e.target.value })}
-                          className="bg-transparent border-b border-muted focus:outline-none" />
-                        <input
-                          type="color"
-                          value={editingCategory.color}
-                          onChange={(e) => setEditingCategory({ ...editingCategory, color: e.target.value })}
-                          className="w-8 h-8 border-none rounded-full cursor-pointer" />
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-4 h-4 rounded-full"
-                          style={{ backgroundColor: category.color }} />
-                        <span>
-                          {category.label} ({category.shortcut})
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex gap-2">
-                      {editingCategory?.id === category.id ? (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleCategorySave(editingCategory)}>
-                          <CheckIcon className="w-4 h-4" />
-                        </Button>
-                      ) : (
-                        <Button variant="ghost" size="icon" onClick={() => handleCategoryEdit(category)}>
-                          <FilePenIcon className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                <div className="mt-4">
-                  <h3 className="text-sm font-semibold mb-2">Add New Category</h3>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="text"
-                      placeholder="Label"
-                      value={newCategory.label}
-                      onChange={(e) => setNewCategory({ ...newCategory, label: e.target.value })}
-                      className="flex-grow"
-                    />
-                    <Input
-                      type="color"
-                      value={newCategory.color}
-                      onChange={(e) => setNewCategory({ ...newCategory, color: e.target.value })}
-                      className="w-10 h-10 p-1 border-none rounded-full cursor-pointer"
-                    />
-                    <Input
-                      type="text"
-                      placeholder="Shortcut"
-                      value={newCategory.shortcut}
-                      onChange={(e) => setNewCategory({ ...newCategory, shortcut: e.target.value })}
-                      className="w-20"
-                    />
-                    <Button onClick={handleAddCategory}>Add</Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Dashboard
+          transcript={transcript}
+          categories={categories}
+          handleTextCategoryChange={handleTextCategoryChange}
+          addCategory={addCategory}
+          updateCategory={updateCategory}
+        />
       ) : (
-        <div
-          className="flex-1 overflow-auto p-4 flex flex-col items-center justify-center">
-          <div className="bg-background rounded-md p-6 max-w-md w-full">
-            {currentTranscriptIndex > 0 && (
-              <div className="bg-background rounded-md p-4 mb-4 w-full opacity-80">
-                {transcript[currentTranscriptIndex - 1].text}
-              </div>
-            )}
-            <div
-              className="bg-muted rounded-md p-4 flex flex-col items-center justify-center"
-              style={{
-                borderLeft: `4px solid ${
-                  categories.find((c) => c.id === transcript[currentTranscriptIndex].category).color
-                }`,
-                backgroundColor: categories.find((c) => c.id === transcript[currentTranscriptIndex].category).color,
-                color:
-                  categories.find((c) => c.id === transcript[currentTranscriptIndex].category).color + "-foreground",
-              }}>
-              <div className="text-lg font-bold mb-2">{transcript[currentTranscriptIndex].text}</div>
-            </div>
-            {currentTranscriptIndex < transcript.length - 1 && (
-              <div className="bg-background rounded-md p-4 mt-4 w-full opacity-80">
-                {transcript[currentTranscriptIndex + 1].text}
-              </div>
-            )}
-            <div className="flex gap-2 mt-4">
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleCategorize(category.id)}
-                  className={`bg-${category.color} text-${category.color}-foreground hover:opacity-80`}>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: category.color }} />
-                    <span>
-                      {category.label} ({category.shortcut})
-                    </span>
-                  </div>
-                </Button>
-              ))}
-            </div>
-            <div className="flex justify-between mt-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                disabled={currentTranscriptIndex === 0}
-                onClick={handlePreviousTranscript}
-                className={`opacity-${currentTranscriptIndex === 0 ? "50" : "100"}`}>
-                <ChevronLeftIcon className="w-4 h-4" />
-                <span className="sr-only">Previous</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                disabled={currentTranscriptIndex === transcript.length - 1}
-                onClick={handleNextTranscript}
-                className={`opacity-${currentTranscriptIndex === transcript.length - 1 ? "50" : "100"}`}>
-                <ChevronRightIcon className="w-4 h-4" />
-                <span className="sr-only">Next</span>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <EasyCategorise
+          transcript={transcript}
+          categories={categories}
+          currentTranscriptIndex={currentTranscriptIndex}
+          handleCategorize={handleCategorize}
+          handlePreviousTranscript={handlePreviousTranscript}
+          handleNextTranscript={handleNextTranscript}
+        />
       )}
     </div>)
   );
