@@ -1,24 +1,35 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 
-const PreviousTranscriptLine = ({ transcript, index, categories, onClick }) => {
-  if (index <= 0) return null;
-  
-  const category = categories.find((c) => c.id === transcript[index - 1].category);
-  
-  return (
-    <div 
-      className="bg-background rounded-md p-4 mb-4 w-full cursor-pointer"
-      style={{
-        opacity: 0.8,
-        borderLeft: `4px solid ${category.color}`,
-        backgroundColor: category.color,
-      }}
-      onClick={onClick}
-    >
-      {transcript[index - 1].text}
-    </div>
-  );
+const TranscriptLine = ({ text, category, onClick, style }) => (
+  <div 
+    className="bg-background rounded-md p-2 w-full cursor-pointer mb-2"
+    style={{
+      ...style,
+      borderLeft: `4px solid ${category.color}`,
+      backgroundColor: category.color,
+    }}
+    onClick={onClick}
+  >
+    {text}
+  </div>
+);
+
+const PreviousTranscriptLines = ({ transcript, currentIndex, categories, handlePreviousTranscript }) => {
+  const lines = [];
+  for (let i = currentIndex - 1; i >= 0; i--) {
+    const category = categories.find((c) => c.id === transcript[i].category);
+    lines.push(
+      <TranscriptLine
+        key={i}
+        text={transcript[i].text}
+        category={category}
+        onClick={() => handlePreviousTranscript(currentIndex - i)}
+        style={{ opacity: 0.8 - (currentIndex - i) * 0.1 }}
+      />
+    );
+  }
+  return <div className="flex-1 overflow-y-auto flex flex-col-reverse">{lines}</div>;
 };
 
 const CurrentTranscriptLine = ({ transcript, index, categories }) => {
@@ -26,39 +37,36 @@ const CurrentTranscriptLine = ({ transcript, index, categories }) => {
   
   return (
     <div
-      className="bg-muted rounded-md p-4 flex flex-col items-center justify-center"
+      className="bg-muted rounded-md p-4 flex flex-col items-center justify-center my-4"
       style={{
         borderLeft: `4px solid ${category.color}`,
         backgroundColor: category.color,
         color: `${category.color}-foreground`,
       }}>
-      <div className="text-lg font-bold mb-2">{transcript[index].text}</div>
+      <div className="text-lg font-bold">{transcript[index].text}</div>
     </div>
   );
 };
 
-const NextTranscriptLine = ({ transcript, index, categories, onClick }) => {
-  if (index >= transcript.length - 1) return null;
-  
-  const category = categories.find((c) => c.id === transcript[index + 1].category);
-  
-  return (
-    <div 
-      className="bg-background rounded-md p-4 mt-4 w-full cursor-pointer"
-      style={{
-        opacity: 0.8,
-        borderLeft: `4px solid ${category.color}`,
-        backgroundColor: category.color,
-      }}
-      onClick={onClick}
-    >
-      {transcript[index + 1].text}
-    </div>
-  );
+const NextTranscriptLines = ({ transcript, currentIndex, categories, handleNextTranscript }) => {
+  const lines = [];
+  for (let i = currentIndex + 1; i < transcript.length; i++) {
+    const category = categories.find((c) => c.id === transcript[i].category);
+    lines.push(
+      <TranscriptLine
+        key={i}
+        text={transcript[i].text}
+        category={category}
+        onClick={() => handleNextTranscript(i - currentIndex)}
+        style={{ opacity: 0.8 - (i - currentIndex - 1) * 0.1 }}
+      />
+    );
+  }
+  return <div className="flex-1 overflow-y-auto flex flex-col">{lines}</div>;
 };
 
 const CategoryButtons = ({ categories, handleCategorize }) => (
-  <div className="flex gap-2 mt-4">
+  <div className="flex flex-wrap gap-2 mt-4">
     {categories.map((category) => (
       <Button
         key={category.id}
@@ -80,25 +88,33 @@ const CategoryButtons = ({ categories, handleCategorize }) => (
 );
 
 export function EasyCategorise({ transcript, categories, currentTranscriptIndex, handleCategorize, handlePreviousTranscript, handleNextTranscript }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.style.height = `${window.innerHeight - 100}px`;
+    }
+  }, []);
+
   return (
-    <div className="flex-1 overflow-auto p-4 flex flex-col items-center justify-center">
-      <div className="bg-background rounded-md p-6 max-w-md w-full">
-        <PreviousTranscriptLine 
+    <div ref={containerRef} className="flex-1 overflow-hidden p-4 flex flex-col items-center justify-center">
+      <div className="bg-background rounded-md p-6 max-w-3xl w-full h-full flex flex-col">
+        <PreviousTranscriptLines 
           transcript={transcript} 
-          index={currentTranscriptIndex} 
+          currentIndex={currentTranscriptIndex} 
           categories={categories}
-          onClick={handlePreviousTranscript}
+          handlePreviousTranscript={handlePreviousTranscript}
         />
         <CurrentTranscriptLine 
           transcript={transcript} 
           index={currentTranscriptIndex} 
           categories={categories}
         />
-        <NextTranscriptLine 
+        <NextTranscriptLines 
           transcript={transcript} 
-          index={currentTranscriptIndex} 
+          currentIndex={currentTranscriptIndex} 
           categories={categories}
-          onClick={handleNextTranscript}
+          handleNextTranscript={handleNextTranscript}
         />
         <CategoryButtons categories={categories} handleCategorize={handleCategorize} />
       </div>
