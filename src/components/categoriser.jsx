@@ -25,48 +25,35 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Categoriser() {
-  const [transcript, setTranscript] = useState([
-    {
-      id: 1,
-      text: "Hello, welcome to our discussion on the new AI tool we've been testing.",
-      category: 1,
-    },
-    {
-      id: 2,
-      text: "I'm really excited to share my thoughts and get your feedback.",
-      category: 1,
-    },
-    {
-      id: 3,
-      text: "So, how has everyone been doing today?",
-      category: 2,
-    },
-    {
-      id: 4,
-      text: "The weather is beautiful outside, isn't it?",
-      category: 3,
-    },
-    {
-      id: 5,
-      text: "Anyway, let's dive into the AI tool. I think the new features are really impressive.",
-      category: 1,
-    },
-    {
-      id: 6,
-      text: "What do you all think about the user interface?",
-      category: 1,
-    },
-    {
-      id: 7,
-      text: "I'm curious to hear your thoughts.",
-      category: 1,
-    },
-    {
-      id: 8,
-      text: "Oh, and don't forget to grab a snack if you need one.",
-      category: 3,
-    },
-  ])
+  const [transcript, setTranscript] = useState([])
+
+  useEffect(() => {
+    fetch('/transcript.json')
+      .then(response => response.json())
+      .then(data => {
+        const formattedTranscript = data.chunks.map((chunk, index) => ({
+          id: index + 1,
+          text: chunk.text,
+          category: getCategoryId(chunk.classification),
+          timestamp: chunk.timestamp
+        }));
+        setTranscript(formattedTranscript);
+      })
+      .catch(error => console.error('Error loading transcript:', error));
+  }, []);
+
+  const getCategoryId = (classification) => {
+    switch (classification) {
+      case "reviewing AI tool":
+        return 1;
+      case "talking to chat":
+        return 2;
+      case "irrelevant":
+        return 3;
+      default:
+        return 3; // Default to irrelevant if unknown
+    }
+  }
   const [categories, setCategories] = useState([
     { id: 1, label: "reviewing AI tool", color: "#4CAF50", shortcut: "1" },
     { id: 2, label: "talking to chat", color: "#2196F3", shortcut: "2" },
@@ -74,7 +61,7 @@ export function Categoriser() {
   ])
   const [editingCategory, setEditingCategory] = useState(null)
   const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0)
-  const [isManualCategorization, setIsManualCategorization] = useState(false)
+  const [isManualCategorization, setIsManualCategorization] = useState(true)
   const handleCategoryEdit = (category) => {
     setEditingCategory(category)
   }
