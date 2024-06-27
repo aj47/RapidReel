@@ -22,6 +22,7 @@ To read more about using these font, please visit the Next.js documentation:
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Categoriser() {
   const [transcript, setTranscript] = useState([
@@ -115,13 +116,16 @@ export function Categoriser() {
       <div className="bg-background text-foreground p-4 border-b border-muted">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Video Transcript</h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsManualCategorization((prev) => !prev)}>
-            <VibrateIcon className="w-4 h-4" />
-            <span className="sr-only">Toggle Categorization View</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsManualCategorization((prev) => !prev)}>
+              <VibrateIcon className="w-4 h-4" />
+              <span className="sr-only">Toggle Categorization View</span>
+            </Button>
+          </div>
         </div>
       </div>
       {isManualCategorization ? (
