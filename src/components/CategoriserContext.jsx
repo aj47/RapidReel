@@ -15,17 +15,13 @@ export const CategoriserProvider = ({ children }) => {
   const [isDashboardView, setIsDashboardView] = useState(true);
   const [lastSavedTime, setLastSavedTime] = useState(null);
   const lastSavedTimeRef = useRef(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const saveTimerRef = useRef(null);
 
   useEffect(() => {
     const fetchTranscript = async () => {
       const response = await fetch("http://localhost:8787/transcript");
       const data = await response.json();
-      // const formattedTranscript = data.chunks.map((chunk, index) => ({
-      //   id: index + 1,
-      //   text: chunk.text,
-      //   category: getCategoryId(chunk.classification),
-      //   timestamp: chunk.timestamp,
-      // }));
       console.log(data);
       setTranscript(data);
     };
@@ -34,6 +30,8 @@ export const CategoriserProvider = ({ children }) => {
   }, []);
 
   const updateDatabase = useCallback(async () => {
+    if (!hasUnsavedChanges) return;
+
     try {
       await fetch("http://localhost:8787/update_transcript", {
         method: "POST",
@@ -46,15 +44,34 @@ export const CategoriserProvider = ({ children }) => {
       const now = new Date();
       setLastSavedTime(now);
       lastSavedTimeRef.current = now;
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error("Error updating database:", error);
     }
-  }, [transcript]);
+  }, [transcript, hasUnsavedChanges]);
+
+  const scheduleUpdate = useCallback(() => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+
+    saveTimerRef.current = setTimeout(() => {
+      updateDatabase();
+    }, Math.min(3000, 15000 - (Date.now() - (lastSavedTimeRef.current?.getTime() || 0))));
+  }, [updateDatabase]);
+
+  const handleChange = useCallback(() => {
+    setHasUnsavedChanges(true);
+    scheduleUpdate();
+  }, [scheduleUpdate]);
 
   useEffect(() => {
-    const intervalId = setInterval(updateDatabase, 10000);
-    return () => clearInterval(intervalId);
-  }, [updateDatabase]);
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, []);
 
   const getCategoryId = (classification) => {
     switch (classification) {
@@ -73,6 +90,7 @@ export const CategoriserProvider = ({ children }) => {
     setTranscript(transcript.map((t) =>
       t.id === textId ? { ...t, category: newCategoryId } : t
     ));
+    handleChange();
   };
 
   const handleCategorize = (categoryId) => {
@@ -82,6 +100,7 @@ export const CategoriserProvider = ({ children }) => {
       )
     );
     handleNextTranscript();
+    handleChange();
   };
 
   const handleNextTranscript = () => {
@@ -95,12 +114,14 @@ export const CategoriserProvider = ({ children }) => {
   const addCategory = (newCategory) => {
     const newId = Math.max(...categories.map((c) => c.id)) + 1;
     setCategories([...categories, { ...newCategory, id: newId }]);
+    handleChange();
   };
 
   const updateCategory = (updatedCategory) => {
     setCategories(
       categories.map((c) => (c.id === updatedCategory.id ? updatedCategory : c))
     );
+    handleChange();
   };
 
   const value = {
@@ -120,6 +141,7 @@ export const CategoriserProvider = ({ children }) => {
     updateCategory,
     lastSavedTime,
     lastSavedTimeRef,
+    hasUnsavedChanges,
   };
 
   return (

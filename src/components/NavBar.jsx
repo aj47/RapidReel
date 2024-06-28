@@ -5,7 +5,7 @@ import { TagIcon, LayoutDashboardIcon, ListChecksIcon } from 'lucide-react';
 import { useCategoriser } from './CategoriserContext';
 
 export function NavBar({ isDashboardView, setIsDashboardView, openCategoryModal }) {
-  const { lastSavedTimeRef } = useCategoriser();
+  const { lastSavedTimeRef, hasUnsavedChanges } = useCategoriser();
   const [timeSinceLastSave, setTimeSinceLastSave] = useState(null);
 
   useEffect(() => {
@@ -19,21 +19,18 @@ export function NavBar({ isDashboardView, setIsDashboardView, openCategoryModal 
 
     return () => clearInterval(intervalId);
   }, [lastSavedTimeRef]);
+
   return (
     <div className="bg-background text-foreground p-4 border-b border-muted">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <h1 className="text-2xl font-bold">RapidReel</h1>
-          {timeSinceLastSave !== null && (
-            <span className="text-xs">
-              {timeSinceLastSave === 0 ? (
-                <span className="text-green-custom">Saved to cloud!</span>
-              ) : (
-                <span className="text-muted-foreground">
-                  Last saved {timeSinceLastSave} seconds ago...
-                </span>
-              )}
-            </span>
+          {hasUnsavedChanges ? (
+            <span className="text-xs text-yellow-500">Unsaved changes</span>
+          ) : (
+            timeSinceLastSave !== null && timeSinceLastSave <= 2 && (
+              <span className="text-xs text-green-custom">Saved to cloud!</span>
+            )
           )}
         </div>
         <div className="flex items-center space-x-2">
