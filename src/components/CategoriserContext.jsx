@@ -6,6 +6,7 @@ export const useCategoriser = () => useContext(CategoriserContext);
 
 export const CategoriserProvider = ({ children }) => {
   const [transcript, setTranscript] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([
     { id: 1, label: "reviewing AI tool", color: "#4CAF50", shortcut: "1" },
     { id: 2, label: "talking to chat", color: "#2196F3", shortcut: "2" },
@@ -26,7 +27,12 @@ export const CategoriserProvider = ({ children }) => {
       setTranscript(data);
     };
 
-    fetchTranscript().catch((error) => console.error("Error loading transcript:", error));
+    fetchTranscript()
+      .then(() => setLoading(false))
+      .catch((error) => {
+        console.error("Error loading transcript:", error);
+        setLoading(false);
+      });
   }, []);
 
   const updateDatabase = useCallback(async () => {
@@ -142,6 +148,7 @@ export const CategoriserProvider = ({ children }) => {
     lastSavedTime,
     lastSavedTimeRef,
     hasUnsavedChanges,
+    loading,
   };
 
   return (

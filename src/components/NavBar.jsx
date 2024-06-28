@@ -35,7 +35,7 @@ export function NavBar({ isDashboardView, setIsDashboardView, openCategoryModal 
         </div>
         <div className="flex items-center space-x-2">
           <ThemeToggle />
-          <Button
+          {/* <Button
             variant="ghost"
             onClick={() => setIsDashboardView((prev) => !prev)}
             className="flex items-center space-x-2">
@@ -45,7 +45,7 @@ export function NavBar({ isDashboardView, setIsDashboardView, openCategoryModal 
               <LayoutDashboardIcon className="w-4 h-4" />
             )}
             <span>{isDashboardView ? "Categorise" : "Dashboard"}</span>
-          </Button>
+          </Button> */}
           <Button
             variant="ghost"
             onClick={openCategoryModal}

@@ -43,8 +43,6 @@ function HomeContent() {
     addCategory,
     updateCategory,
     currentTranscriptIndex,
-    isDashboardView,
-    setIsDashboardView,
     handleCategorize,
     handleNextTranscript,
     handlePreviousTranscript,
@@ -90,15 +88,9 @@ function HomeContent() {
   return (
     (<div className="flex flex-col h-screen">
       <NavBar 
-        isDashboardView={isDashboardView}
-        setIsDashboardView={setIsDashboardView}
         openCategoryModal={openCategoryModal}
       />
-      {isDashboardView ? (
-        <Dashboard />
-      ) : (
-        <EasyCategorise />
-      )}
+      <EasyCategorise />
       <CategoryModal isOpen={isCategoryModalOpen} onClose={closeCategoryModal} />
     </div>)
   );

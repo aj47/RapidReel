@@ -34,6 +34,7 @@ const PreviousTranscriptLines = ({ transcript, currentIndex, categories, handleP
 };
 
 const CurrentTranscriptLine = ({ transcript, index, categories }) => {
+	console.log(index);
   const category = categories.find((c) => c.id === transcript[index].category);
   
   return (
@@ -95,8 +96,12 @@ export function EasyCategorise() {
     currentTranscriptIndex,
     handleCategorize,
     handlePreviousTranscript,
-    handleNextTranscript
+    handleNextTranscript,
+    loading
   } = useCategoriser();
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   const containerRef = useRef(null);
 
@@ -105,6 +110,10 @@ export function EasyCategorise() {
       containerRef.current.style.height = `${window.innerHeight - 100}px`;
     }
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div ref={containerRef} className="flex-1 overflow-hidden p-4 flex flex-col items-center justify-center">

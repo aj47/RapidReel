@@ -10,8 +10,10 @@ import { MoveVerticalIcon } from "lucide-react";
 import { useCategoriser } from "./CategoriserContext";
 
 export function Dashboard() {
-  const { transcript, categories, handleTextCategoryChange } = useCategoriser();
-  console.log(transcript)
+  const { transcript, categories, handleTextCategoryChange, loading } = useCategoriser();
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="flex-1 overflow-auto p-4">
       <div className="bg-muted rounded-md p-4">
