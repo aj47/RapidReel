@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { TagIcon } from 'lucide-react';
 
-export function NavBar({ isManualCategorization, setIsManualCategorization }) {
+export function NavBar({ isManualCategorization, setIsManualCategorization, openCategoryModal }) {
   return (
     <div className="bg-background text-foreground p-4 border-b border-muted">
       <div className="flex items-center justify-between">
@@ -15,6 +16,13 @@ export function NavBar({ isManualCategorization, setIsManualCategorization }) {
             onClick={() => setIsManualCategorization((prev) => !prev)}>
             <VibrateIcon className="w-4 h-4" />
             <span className="sr-only">Toggle Categorization View</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={openCategoryModal}>
+            <TagIcon className="w-4 h-4" />
+            <span className="sr-only">Manage Categories</span>
           </Button>
         </div>
       </div>

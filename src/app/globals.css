@@ -29,3 +29,12 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Add these new styles */
+.modal-background {
+  background-color: white;
+}
+
+.dark .modal-background {
+  background-color: #1f2937; /* dark gray for dark mode */
+}

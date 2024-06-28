@@ -23,6 +23,7 @@ import { useEffect, useState } from "react"
 import { Dashboard } from "@/components/Dashboard"
 import { EasyCategorise } from "@/components/EasyCategorise"
 import { NavBar } from "@/components/NavBar"
+import { CategoryModal } from "@/components/CategoryModal"
 
 import { useCategoriser, CategoriserProvider } from "./CategoriserContext"
 
@@ -51,6 +52,7 @@ function CategoriserContent() {
 
   const [editingCategory, setEditingCategory] = useState(null)
   const [newCategory, setNewCategory] = useState({ label: "", color: "#000000", shortcut: "" })
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
 
   const handleAddCategory = () => {
     if (newCategory.label && newCategory.color && newCategory.shortcut) {
@@ -81,11 +83,16 @@ function CategoriserContent() {
       document.removeEventListener("keydown", handleKeyboardShortcut)
     };
   }, [categories, handleKeyboardShortcut])
+
+  const openCategoryModal = () => setIsCategoryModalOpen(true)
+  const closeCategoryModal = () => setIsCategoryModalOpen(false)
+
   return (
     (<div className="flex flex-col h-screen">
       <NavBar 
         isManualCategorization={isManualCategorization}
         setIsManualCategorization={setIsManualCategorization}
+        openCategoryModal={openCategoryModal}
       />
       {isManualCategorization ? (
         <Dashboard
@@ -105,6 +112,7 @@ function CategoriserContent() {
           handleNextTranscript={handleNextTranscript}
         />
       )}
+      <CategoryModal isOpen={isCategoryModalOpen} onClose={closeCategoryModal} />
     </div>)
   );
 }
