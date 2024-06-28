@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 
 const CategoriserContext = createContext();
 
@@ -13,6 +13,8 @@ export const CategoriserProvider = ({ children }) => {
   ]);
   const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0);
   const [isDashboardView, setIsDashboardView] = useState(true);
+  const [lastSavedTime, setLastSavedTime] = useState(null);
+  const lastSavedTimeRef = useRef(null);
 
   useEffect(() => {
     const fetchTranscript = async () => {
@@ -41,6 +43,9 @@ export const CategoriserProvider = ({ children }) => {
         body: JSON.stringify(transcript),
       });
       console.log("Database updated successfully");
+      const now = new Date();
+      setLastSavedTime(now);
+      lastSavedTimeRef.current = now;
     } catch (error) {
       console.error("Error updating database:", error);
     }
@@ -113,6 +118,8 @@ export const CategoriserProvider = ({ children }) => {
     handlePreviousTranscript,
     addCategory,
     updateCategory,
+    lastSavedTime,
+    lastSavedTimeRef,
   };
 
   return (

@@ -38,3 +38,11 @@ body {
 .dark .modal-background {
   background-color: #1f2937; /* dark gray for dark mode */
 }
+
+.text-green-custom {
+  color: #10b981; /* This is the color for Tailwind's green-500 */
+}
+
+.dark .text-green-custom {
+  color: #34d399; /* This is the color for Tailwind's green-400, which might be more visible in dark mode */
+}

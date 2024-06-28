@@ -1,13 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TagIcon, LayoutDashboardIcon, ListChecksIcon } from 'lucide-react';
+import { useCategoriser } from './CategoriserContext';
 
 export function NavBar({ isDashboardView, setIsDashboardView, openCategoryModal }) {
+  const { lastSavedTimeRef } = useCategoriser();
+  const [timeSinceLastSave, setTimeSinceLastSave] = useState(null);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (lastSavedTimeRef.current) {
+        const now = new Date();
+        const diffInSeconds = Math.round((now - lastSavedTimeRef.current) / 1000);
+        setTimeSinceLastSave(diffInSeconds);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [lastSavedTimeRef]);
   return (
     <div className="bg-background text-foreground p-4 border-b border-muted">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">RapidReel</h1>
+        <div className="flex items-center space-x-4">
+          <h1 className="text-2xl font-bold">RapidReel</h1>
+          {timeSinceLastSave !== null && (
+            <span className="text-xs">
+              {timeSinceLastSave === 0 ? (
+                <span className="text-green-custom">Saved to cloud!</span>
+              ) : (
+                <span className="text-muted-foreground">
+                  Last saved {timeSinceLastSave} seconds ago...
+                </span>
+              )}
+            </span>
+          )}
+        </div>
         <div className="flex items-center space-x-2">
           <ThemeToggle />
           <Button
