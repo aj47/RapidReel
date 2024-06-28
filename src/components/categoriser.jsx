@@ -20,12 +20,9 @@ To read more about using these font, please visit the Next.js documentation:
 "use client"
 
 import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { Input } from "./ui/input"
 import { Dashboard } from "@/components/Dashboard"
 import { EasyCategorise } from "@/components/EasyCategorise"
+import { NavBar } from "@/components/NavBar"
 
 import { useCategoriser, CategoriserProvider } from "./CategoriserContext"
 
@@ -86,21 +83,10 @@ function CategoriserContent() {
   }, [categories, handleKeyboardShortcut])
   return (
     (<div className="flex flex-col h-screen">
-      <div className="bg-background text-foreground p-4 border-b border-muted">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Video Transcript</h1>
-          <div className="flex items-center space-x-2">
-            <ThemeToggle />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsManualCategorization((prev) => !prev)}>
-              <VibrateIcon className="w-4 h-4" />
-              <span className="sr-only">Toggle Categorization View</span>
-            </Button>
-          </div>
-        </div>
-      </div>
+      <NavBar 
+        isManualCategorization={isManualCategorization}
+        setIsManualCategorization={setIsManualCategorization}
+      />
       {isManualCategorization ? (
         <Dashboard
           transcript={transcript}
@@ -245,22 +231,3 @@ function ShuffleIcon(props) {
 }
 
 
-function VibrateIcon(props) {
-  return (
-    (<svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round">
-      <path d="m2 8 2 2-2 2 2 2-2 2" />
-      <path d="m22 8-2 2 2 2-2 2 2 2" />
-      <rect width="8" height="14" x="8" y="5" rx="1" />
-    </svg>)
-  );
-}
