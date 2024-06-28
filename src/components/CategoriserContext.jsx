@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const CategoriserContext = createContext();
 
@@ -12,21 +12,21 @@ export const CategoriserProvider = ({ children }) => {
     { id: 3, label: "irrelevant", color: "#808080", shortcut: "3" },
   ]);
   const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0);
-  const [isManualCategorization, setIsManualCategorization] = useState(true);
+  const [isDashboardView, setIsDashboardView] = useState(true);
 
   useEffect(() => {
-    fetch('/transcript.json')
-      .then(response => response.json())
-      .then(data => {
+    fetch("/transcript.json")
+      .then((response) => response.json())
+      .then((data) => {
         const formattedTranscript = data.chunks.map((chunk, index) => ({
           id: index + 1,
           text: chunk.text,
           category: getCategoryId(chunk.classification),
-          timestamp: chunk.timestamp
+          timestamp: chunk.timestamp,
         }));
         setTranscript(formattedTranscript);
       })
-      .catch(error => console.error('Error loading transcript:', error));
+      .catch((error) => console.error("Error loading transcript:", error));
   }, []);
 
   const getCategoryId = (classification) => {
@@ -40,37 +40,43 @@ export const CategoriserProvider = ({ children }) => {
       default:
         return 3; // Default to irrelevant if unknown
     }
-  }
+  };
 
   const handleTextCategoryChange = (textId, newCategoryId) => {
     setTranscript(
-      transcript.map((t) => (t.id === textId ? { ...t, category: newCategoryId } : t))
-    )
-  }
+      transcript.map((t) =>
+        t.id === textId ? { ...t, category: newCategoryId } : t
+      )
+    );
+  };
 
   const handleCategorize = (categoryId) => {
-    setTranscript(transcript.map(
-      (t, index) => (index === currentTranscriptIndex ? { ...t, category: categoryId } : t)
-    ))
-    handleNextTranscript()
-  }
+    setTranscript(
+      transcript.map((t, index) =>
+        index === currentTranscriptIndex ? { ...t, category: categoryId } : t
+      )
+    );
+    handleNextTranscript();
+  };
 
   const handleNextTranscript = () => {
-    setCurrentTranscriptIndex((prevIndex) => prevIndex + 1)
-  }
+    setCurrentTranscriptIndex((prevIndex) => prevIndex + 1);
+  };
 
   const handlePreviousTranscript = () => {
-    setCurrentTranscriptIndex((prevIndex) => prevIndex - 1)
-  }
+    setCurrentTranscriptIndex((prevIndex) => prevIndex - 1);
+  };
 
   const addCategory = (newCategory) => {
-    const newId = Math.max(...categories.map(c => c.id)) + 1
-    setCategories([...categories, { ...newCategory, id: newId }])
-  }
+    const newId = Math.max(...categories.map((c) => c.id)) + 1;
+    setCategories([...categories, { ...newCategory, id: newId }]);
+  };
 
   const updateCategory = (updatedCategory) => {
-    setCategories(categories.map((c) => (c.id === updatedCategory.id ? updatedCategory : c)))
-  }
+    setCategories(
+      categories.map((c) => (c.id === updatedCategory.id ? updatedCategory : c))
+    );
+  };
 
   const value = {
     transcript,
@@ -79,8 +85,8 @@ export const CategoriserProvider = ({ children }) => {
     setCategories,
     currentTranscriptIndex,
     setCurrentTranscriptIndex,
-    isManualCategorization,
-    setIsManualCategorization,
+    isDashboardView,
+    setIsDashboardView,
     handleTextCategoryChange,
     handleCategorize,
     handleNextTranscript,

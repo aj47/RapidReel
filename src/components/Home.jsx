@@ -43,8 +43,8 @@ function HomeContent() {
     addCategory,
     updateCategory,
     currentTranscriptIndex,
-    isManualCategorization,
-    setIsManualCategorization,
+    isDashboardView,
+    setIsDashboardView,
     handleCategorize,
     handleNextTranscript,
     handlePreviousTranscript,
@@ -90,11 +90,11 @@ function HomeContent() {
   return (
     (<div className="flex flex-col h-screen">
       <NavBar 
-        isManualCategorization={isManualCategorization}
-        setIsManualCategorization={setIsManualCategorization}
+        isDashboardView={isDashboardView}
+        setIsDashboardView={setIsDashboardView}
         openCategoryModal={openCategoryModal}
       />
-      {isManualCategorization ? (
+      {isDashboardView ? (
         <Dashboard />
       ) : (
         <EasyCategorise />
