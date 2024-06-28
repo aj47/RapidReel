@@ -1,10 +1,9 @@
-import Image from "next/image";
-import { Categoriser } from "@/components/categoriser";
+import { Home as HomeComponent } from "@/components/Home";
 
 export default function Home() {
   return (
     <div>
-      <Categoriser />
+      <HomeComponent />
     </div>
   );
 }

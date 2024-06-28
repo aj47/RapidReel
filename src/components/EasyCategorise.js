@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
+import { useCategoriser } from "./CategoriserContext";
 
 const TranscriptLine = ({ text, category, onClick, style }) => (
   <div 
@@ -87,7 +88,16 @@ const CategoryButtons = ({ categories, handleCategorize }) => (
   </div>
 );
 
-export function EasyCategorise({ transcript, categories, currentTranscriptIndex, handleCategorize, handlePreviousTranscript, handleNextTranscript }) {
+export function EasyCategorise() {
+  const {
+    transcript,
+    categories,
+    currentTranscriptIndex,
+    handleCategorize,
+    handlePreviousTranscript,
+    handleNextTranscript
+  } = useCategoriser();
+
   const containerRef = useRef(null);
 
   useEffect(() => {

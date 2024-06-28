@@ -27,15 +27,15 @@ import { CategoryModal } from "@/components/CategoryModal"
 
 import { useCategoriser, CategoriserProvider } from "./CategoriserContext"
 
-export function Categoriser() {
+export function Home() {
   return (
     <CategoriserProvider>
-      <CategoriserContent />
+      <HomeContent />
     </CategoriserProvider>
   );
 }
 
-function CategoriserContent() {
+function HomeContent() {
   const {
     transcript,
     categories,
