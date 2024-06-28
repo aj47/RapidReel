@@ -16,7 +16,7 @@ export const CategoriserProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchTranscript = async () => {
-      const response = await fetch("https://api.yourdomain.com/transcript");
+      const response = await fetch("https://rapidreel_worker.your-subdomain.workers.dev/transcript");
       const data = await response.json();
       const formattedTranscript = data.chunks.map((chunk, index) => ({
         id: index + 1,
@@ -49,7 +49,7 @@ export const CategoriserProvider = ({ children }) => {
     );
     setTranscript(updatedTranscript);
 
-    await fetch("https://api.yourdomain.com/update_transcript", {
+    await fetch("https://rapidreel_worker.your-subdomain.workers.dev/update_transcript", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
