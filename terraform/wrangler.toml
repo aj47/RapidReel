@@ -1,0 +1,13 @@
+name = "rapidreel_worker"
+main = "rapidreel_worker.js"
+compatibility_date = "2023-01-01"
+
+[[kv_namespaces]]
+binding = "RAPIDREEL_KV"
+id = "18b053bb181246cca3a638216379b4d2"
+preview_id = "18b053bb181246cca3a638216379b4d2"
+
+[env.preview]
+[[kv_namespaces]]
+binding = "RAPIDREEL_KV_PREVIEW"
+id = "18b053bb181246cca3a638216379b4d2"
