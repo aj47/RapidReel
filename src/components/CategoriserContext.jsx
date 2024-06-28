@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 const CategoriserContext = createContext();
 
@@ -18,17 +18,38 @@ export const CategoriserProvider = ({ children }) => {
     const fetchTranscript = async () => {
       const response = await fetch("http://localhost:8787/transcript");
       const data = await response.json();
-      const formattedTranscript = data.chunks.map((chunk, index) => ({
-        id: index + 1,
-        text: chunk.text,
-        category: getCategoryId(chunk.classification),
-        timestamp: chunk.timestamp,
-      }));
-      setTranscript(formattedTranscript);
+      // const formattedTranscript = data.chunks.map((chunk, index) => ({
+      //   id: index + 1,
+      //   text: chunk.text,
+      //   category: getCategoryId(chunk.classification),
+      //   timestamp: chunk.timestamp,
+      // }));
+      console.log(data);
+      setTranscript(data);
     };
 
     fetchTranscript().catch((error) => console.error("Error loading transcript:", error));
   }, []);
+
+  const updateDatabase = useCallback(async () => {
+    try {
+      await fetch("http://localhost:8787/update_transcript", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transcript),
+      });
+      console.log("Database updated successfully");
+    } catch (error) {
+      console.error("Error updating database:", error);
+    }
+  }, [transcript]);
+
+  useEffect(() => {
+    const intervalId = setInterval(updateDatabase, 10000);
+    return () => clearInterval(intervalId);
+  }, [updateDatabase]);
 
   const getCategoryId = (classification) => {
     switch (classification) {
@@ -43,19 +64,10 @@ export const CategoriserProvider = ({ children }) => {
     }
   };
 
-  const handleTextCategoryChange = async (textId, newCategoryId) => {
-    const updatedTranscript = transcript.map((t) =>
+  const handleTextCategoryChange = (textId, newCategoryId) => {
+    setTranscript(transcript.map((t) =>
       t.id === textId ? { ...t, category: newCategoryId } : t
-    );
-    setTranscript(updatedTranscript);
-
-    await fetch("http://localhost:8787/update_transcript", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedTranscript),
-    });
+    ));
   };
 
   const handleCategorize = (categoryId) => {
