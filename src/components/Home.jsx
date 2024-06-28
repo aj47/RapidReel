@@ -95,22 +95,9 @@ function HomeContent() {
         openCategoryModal={openCategoryModal}
       />
       {isManualCategorization ? (
-        <Dashboard
-          transcript={transcript}
-          categories={categories}
-          handleTextCategoryChange={handleTextCategoryChange}
-          addCategory={addCategory}
-          updateCategory={updateCategory}
-        />
+        <Dashboard />
       ) : (
-        <EasyCategorise
-          transcript={transcript}
-          categories={categories}
-          currentTranscriptIndex={currentTranscriptIndex}
-          handleCategorize={handleCategorize}
-          handlePreviousTranscript={handlePreviousTranscript}
-          handleNextTranscript={handleNextTranscript}
-        />
+        <EasyCategorise />
       )}
       <CategoryModal isOpen={isCategoryModalOpen} onClose={closeCategoryModal} />
     </div>)
