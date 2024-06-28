@@ -99,9 +99,6 @@ export function EasyCategorise() {
     handleNextTranscript,
     loading
   } = useCategoriser();
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const containerRef = useRef(null);
 
