@@ -15,18 +15,19 @@ export const CategoriserProvider = ({ children }) => {
   const [isDashboardView, setIsDashboardView] = useState(true);
 
   useEffect(() => {
-    fetch("/transcript.json")
-      .then((response) => response.json())
-      .then((data) => {
-        const formattedTranscript = data.chunks.map((chunk, index) => ({
-          id: index + 1,
-          text: chunk.text,
-          category: getCategoryId(chunk.classification),
-          timestamp: chunk.timestamp,
-        }));
-        setTranscript(formattedTranscript);
-      })
-      .catch((error) => console.error("Error loading transcript:", error));
+    const fetchTranscript = async () => {
+      const response = await fetch("https://api.yourdomain.com/transcript");
+      const data = await response.json();
+      const formattedTranscript = data.chunks.map((chunk, index) => ({
+        id: index + 1,
+        text: chunk.text,
+        category: getCategoryId(chunk.classification),
+        timestamp: chunk.timestamp,
+      }));
+      setTranscript(formattedTranscript);
+    };
+
+    fetchTranscript().catch((error) => console.error("Error loading transcript:", error));
   }, []);
 
   const getCategoryId = (classification) => {
@@ -42,12 +43,19 @@ export const CategoriserProvider = ({ children }) => {
     }
   };
 
-  const handleTextCategoryChange = (textId, newCategoryId) => {
-    setTranscript(
-      transcript.map((t) =>
-        t.id === textId ? { ...t, category: newCategoryId } : t
-      )
+  const handleTextCategoryChange = async (textId, newCategoryId) => {
+    const updatedTranscript = transcript.map((t) =>
+      t.id === textId ? { ...t, category: newCategoryId } : t
     );
+    setTranscript(updatedTranscript);
+
+    await fetch("https://api.yourdomain.com/update_transcript", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedTranscript),
+    });
   };
 
   const handleCategorize = (categoryId) => {
